@@ -29,6 +29,49 @@
                   <%= link_to 'Destroy', book_path(@book.id), method: :delete, data: {confirm:"本当に消しますか？"}, rel:"nofollow", class:"btn btn-sm btn-danger destroy_book_36355" %>
                 </td>
               <% end %>
+
+              <% if @book.favorited_by?(current_user) %>
+                <td>
+                  <%= link_to book_favorites_path(@book.id), method: :delete do %>
+                    <i class="fas fa-heart"></i><%= @book.favorites.count %> いいね
+                  <% end %>
+                </td>
+                <% else %>
+                <td>
+                  <%= link_to book_favorites_path(@book.id), method: :post do %>
+                    <i class="far fa-heart"></i><%= @book.favorites.count %> いいね
+                  <% end %>
+                </td>
+              <% end %>
+              <td>コメント件数：<%= @book.book_comments.count %></td>
+            </tr>
+            <tr>
+              <td>
+                <% @book.book_comments.each do |book_comment| %>
+                  <%=attachment_image_tag @book.user, :profile_image, size:'40x40', format: 'jpeg', fallback: "no_image.jpg", class:"attachment user profile_image fallback" %>
+                  <%= book_comment.user.name %>
+                  <%= book_comment.created_at.strftime('%Y/%m/%d') %><%= book_comment.comment %>
+                  <% if book_comment.user == current_user %>
+                  <div class="comment-delete">
+                    <%= link_to "Destroy", book_book_comment_path(book_comment.book, book_comment), method: :delete %>
+                  </div>
+                  <% end %>
+                <% end %>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="new-comment">
+                  <%= form_with(model:[@book, @book_comment], local: true) do |f| %>
+                    <div class="form-group">
+                      <%= f.text_area :comment, rows:'5',placeholder: "Comment here" %>
+                    </div>
+                    <div class="form-group">
+                      <%= f.submit "送信" %>
+                    </div>
+                  <% end %>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
